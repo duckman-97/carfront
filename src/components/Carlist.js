@@ -3,6 +3,10 @@ import {SERVER_URL} from '../constans.js';
 import {DataGrid} from '@mui/x-data-grid';
 import Snackbar from '@mui/material/Snackbar';
 import AddCar from './AddCar.js';
+import EditCar from './EditCar.js';
+import { fabClasses } from '@mui/material';
+
+
 
 function Carlist(props){
     const [cars, setCars] = useState([]);
@@ -15,6 +19,20 @@ function Carlist(props){
         {field: 'year', headerName: 'Year', width: 150},
         {field: 'price', headerName: 'Price', width: 150},
         {
+            field : '_links.car.href',
+            headerName:'',
+            sortable:false,
+            filterble:fabClasses,
+            renderCell:row =>
+            <EditCar
+                data={row}
+                updateCar={updateCar}/>
+
+        },
+
+
+        {
+
             field : '_link.self.href',
             headerName: '',
             sortable: false,
@@ -61,6 +79,34 @@ function Carlist(props){
         })
         .catch(err=>console.error(err))
     }
+
+    const updateCar = (car,link) =>{
+        fetch(link,
+            {
+                method:'PUT',
+                headers:{'Content-Type': 'application/json'},
+                body: JSON.stringify(car)
+            }
+            )
+
+
+        .then(response=>{
+            if(response.ok){
+                fetchCars();
+            }
+            else{
+                alert('Something went wrong!');
+            }
+
+
+        })
+
+        .catch(err => console.error(err))
+    }
+
+
+
+
 
     const onDelClick= (url)=>{
         if(window.confirm("Are you sure to delete?")){
